@@ -1,0 +1,71 @@
+
+
+<div class="index">
+	<h1>{{title}}</h1>
+	<input type="checkbox" name="IsCustomUrl" id="IsCustomUrl" onclick="onClickIsCustomUrl()" >Custom alias<br><br>
+	<input type="text" name="FullUrl" id="FullUrl"  placeholder="URL" required="required" oninput="oninputFullUrl(this.value)" /><br><br>
+	<input type="text" name="CustomURL" id="CustomURL"  placeholder="Custom URL" required="required" oninput="oninputCustomURL(this.value)" hidden/><br><br>
+
+	<h1 id="showCustomUrl"></h1>
+	<button type="submit" class="btn btn-primary btn-block btn-large" onclick="sendData()" >GO.....</button>
+	<h1 id="showMSG"></h1>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+	<script>
+		function oninputFullUrl(val) {
+			$("#showMSG").text("");
+		}
+		function onClickIsCustomUrl(val) {
+			if($('#IsCustomUrl').is(":checked")){
+				$("#CustomURL").show();
+			}else{
+				$("#CustomURL").hide();
+				$('#CustomURL').val("");
+			}
+		}
+		function oninputCustomURL(val) {
+			if($('#IsCustomUrl').is(":checked")){
+				$("#showCustomUrl").text(window.location.href+val);
+			}else{
+				$("#showCustomUrl").text("");
+			}
+		}
+
+		function sendData(){
+        //get the input value
+        $FullUrl=$('#FullUrl').val();
+        $CustomURL=$('#CustomURL').val();
+        $FullUrl=$FullUrl.replace(/^https?:\/\//,'');
+        $FullUrl=$FullUrl.replace(/^http?:\/\//,'');
+        
+        if($('#IsCustomUrl').is(":checked")){
+        	$IsCustomUrl="1";
+        }else{
+        	$IsCustomUrl="0";
+        }
+
+        $.ajax({
+        	url: "/api/submit",
+        	data: {FullUrl : $FullUrl,IsCustomUrl:$IsCustomUrl,CustomURL:$CustomURL},
+        	type: "POST",
+        	dataType: "json",
+        	success: function(data){
+        		if(data.error){
+        			$("#showMSG").text(data.error);
+
+        		}else{
+        			$("#showMSG").text(window.location.href+data.FullUrl);
+
+        		}
+        		$("#showCustomUrl").text("");
+        		$('#FullUrl').val("");
+        		$('#CustomURL').val("");
+        		$('#showCustomUrl').val("");
+        		$("#CustomURL").hide();
+        		$('#IsCustomUrl').attr('checked', false);
+        	}
+        });
+    }
+
+</script>
